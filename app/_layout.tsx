@@ -1,16 +1,49 @@
-import { useColorScheme } from '@/hooks/useColorScheme';
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { ThemeProvider, useThemeContext } from '@/hooks/useThemeContext';
+import { Stack } from 'expo-router';
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
-import CreateNoteScreen from './create-note';
-import ListNotesScreen from '.';
-import { Stack } from 'expo-router';
+import ThemeToggle from '@/components/ThemeToggle';
+import { View } from 'react-native';
 
-const App = () => {
-  const colorScheme = useColorScheme();
+const StackLayout = () => {
+  const { isDark } = useThemeContext();
+
+  return (
+    <Stack>
+      <Stack.Screen
+        name="index"
+        options={{ 
+          title: 'Mis Notas',
+          headerTransparent: true,
+          headerTintColor: isDark ? '#fff' : '#1E293B',
+          headerTitleStyle: { fontWeight: 'bold' },
+        }}
+      />
+      <Stack.Screen
+        name='create-note'
+        options={{ 
+          title: 'Crear Nota',
+          headerTransparent: true,
+          headerTintColor: isDark ? '#fff' : '#1E293B',
+          headerTitleStyle: { fontWeight: 'bold' },
+          headerRight: () => <ThemeToggle />
+        }}
+      />
+      <Stack.Screen
+        name="login"
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="register"
+        options={{ headerShown: false }}
+      />
+    </Stack>
+  );
+};
+
+export default function App() {
   const [loaded] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
   });
@@ -21,29 +54,11 @@ const App = () => {
     }
   }, [loaded]);
 
-  if (!loaded) {
-    return null;
-  }
+  if (!loaded) return null;
 
   return (
-    <Stack>
-      <Stack.Screen
-        name="index"
-        options={
-          {
-            title: 'Mis Notas',
-          }
-        }
-      />
-      <Stack.Screen
-        name='create-note'
-        options={
-          {
-            title: 'Crear nueva nota'
-          }
-        }
-      />
-    </Stack>
+    <ThemeProvider>
+      <StackLayout />
+    </ThemeProvider>
   );
-};
-export default App;
+}
